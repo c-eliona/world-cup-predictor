@@ -24,11 +24,14 @@ export default function Navbar() {
               <Link to="/predictions" className={`text-sm font-medium pb-1 ${isActive('/predictions')}`}>
                 Predict
               </Link>
-              <Link to="/leaderboard" className={`text-sm font-medium pb-1 ${isActive('/leaderboard')}`}>
-                Leaderboard
-              </Link>
             </>
           )}
+          <Link to="/leaderboard" className={`text-sm font-medium pb-1 ${isActive('/leaderboard')}`}>
+            Leaderboard
+          </Link>
+          <Link to="/admin" className={`text-sm font-medium pb-1 ${isActive('/admin')}`}>
+            Admin
+          </Link>
         </div>
 
         <div className="flex items-center gap-2">

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { subscribeToMatches, subscribeToPredictions, savePrediction } from '../services/supabase'
 import { usePlayer } from '../context/PlayerContext'
@@ -8,11 +8,25 @@ function isLocked(kickoff) {
   return new Date(kickoff) < new Date()
 }
 
+const TZ = 'America/New_York'
+
 function formatKickoff(kickoff) {
-  return new Date(kickoff).toLocaleString(undefined, {
-    weekday: 'short', month: 'short', day: 'numeric',
-    hour: '2-digit', minute: '2-digit',
+  return new Date(kickoff).toLocaleString('en-GB', {
+    hour: '2-digit', minute: '2-digit', timeZone: TZ,
   })
+}
+
+function matchDay(kickoff) {
+  // Returns a label like "Thu 18 Jun" in Europe/Budapest time
+  return new Date(kickoff).toLocaleDateString('en-GB', {
+    weekday: 'short', day: 'numeric', month: 'short', timeZone: TZ,
+  })
+}
+
+function matchDayKey(kickoff) {
+  // Returns a sortable key like "2026-06-18" based on Europe/Budapest date
+  return new Date(kickoff).toLocaleDateString('en-CA', { timeZone: TZ })
+  // en-CA produces YYYY-MM-DD format
 }
 
 function pointsBadge(points) {
@@ -62,8 +76,13 @@ function MatchCard({ match, prediction, onSave }) {
 
   return (
     <div className={`card mb-3 ${locked ? 'opacity-80' : ''}`}>
+      {/* Time + round label */}
       <div className="flex items-center justify-between mb-3">
-        <span className="text-xs text-gray-500">{formatKickoff(match.kickoff)}</span>
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-gray-500">{formatKickoff(match.kickoff)}</span>
+          <span className="text-xs text-gray-600">·</span>
+          <span className="text-xs text-gray-600">{match.round}</span>
+        </div>
         {locked && !match.finished && <span className="text-xs text-amber-500 font-medium">🔒 Locked</span>}
         {match.finished && (
           <span className="text-xs text-emerald-500 font-medium">✅ {match.homeScore}–{match.awayScore}</span>
@@ -122,7 +141,7 @@ export default function Predictions() {
   const [matches, setMatches] = useState([])
   const [predictions, setPredictions] = useState({})
   const [loading, setLoading] = useState(true)
-  const [activeRound, setActiveRound] = useState(null)
+  const [activeDay, setActiveDay] = useState(null)
 
   useEffect(() => {
     if (!player) { navigate('/'); return }
@@ -134,19 +153,23 @@ export default function Predictions() {
     return () => { unsubMatches(); unsubPreds() }
   }, [player])
 
+  // Group matches by calendar day (local date)
   const grouped = matches.reduce((acc, m) => {
-    if (!acc[m.round]) acc[m.round] = []
-    acc[m.round].push(m)
+    const key = matchDayKey(m.kickoff)
+    if (!acc[key]) acc[key] = []
+    acc[key].push(m)
     return acc
   }, {})
-  const rounds = Object.keys(grouped)
 
+  const days = Object.keys(grouped).sort()
+
+  // Auto-select first day with upcoming matches
   useEffect(() => {
-    if (rounds.length > 0 && !activeRound) {
-      const upcoming = rounds.find(r => grouped[r].some(m => !isLocked(m.kickoff)))
-      setActiveRound(upcoming || rounds[0])
+    if (days.length > 0 && !activeDay) {
+      const upcoming = days.find(d => grouped[d].some(m => !isLocked(m.kickoff)))
+      setActiveDay(upcoming || days[0])
     }
-  }, [rounds.length])
+  }, [days.length])
 
   if (!player) return null
 
@@ -163,12 +186,12 @@ export default function Predictions() {
       <div className="max-w-2xl mx-auto px-4 py-12 text-center">
         <div className="text-5xl mb-4">⏳</div>
         <h2 className="text-xl font-bold text-white mb-2">No matches yet</h2>
-        <p className="text-gray-500">The admin hasn't seeded the matches yet. Check back soon!</p>
+        <p className="text-gray-500">The admin hasn't seeded the matches yet.</p>
       </div>
     )
   }
 
-  const currentMatches = grouped[activeRound] || []
+  const currentMatches = grouped[activeDay] || []
   const unlockedCount = currentMatches.filter(m => !isLocked(m.kickoff)).length
   const savedCount = currentMatches.filter(m => predictions[m.id] != null).length
 
@@ -179,14 +202,17 @@ export default function Predictions() {
         <p className="text-gray-500 text-sm mt-1">👤 {player.name}</p>
       </div>
 
-      <div className="flex gap-2 overflow-x-auto pb-3 mb-6">
-        {rounds.map((r) => {
-          const hasUpcoming = grouped[r].some(m => !isLocked(m.kickoff))
-          const isActive = r === activeRound
+      {/* Day tabs */}
+      <div className="flex gap-2 overflow-x-auto pb-3 mb-4">
+        {days.map((dayKey) => {
+          const dayMatches = grouped[dayKey]
+          const hasUpcoming = dayMatches.some(m => !isLocked(m.kickoff))
+          const isActive = dayKey === activeDay
+          const label = matchDay(dayMatches[0].kickoff)
           return (
             <button
-              key={r}
-              onClick={() => setActiveRound(r)}
+              key={dayKey}
+              onClick={() => setActiveDay(dayKey)}
               className={`flex-shrink-0 text-xs font-medium px-3 py-1.5 rounded-full border transition-colors ${
                 isActive
                   ? 'bg-emerald-600 border-emerald-500 text-white'
@@ -195,17 +221,19 @@ export default function Predictions() {
                   : 'bg-gray-800 border-gray-700 text-gray-500 hover:border-gray-600'
               }`}
             >
-              {r}
+              {label}
             </button>
           )
         })}
       </div>
 
+      {/* Day summary */}
       <div className="text-sm text-gray-500 mb-4">
         {savedCount}/{currentMatches.length} predicted
         {unlockedCount > 0 && ` · ${unlockedCount} open`}
       </div>
 
+      {/* Match cards */}
       {currentMatches.map((match) => (
         <MatchCard
           key={match.id}

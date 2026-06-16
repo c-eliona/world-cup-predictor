@@ -1,117 +1,132 @@
+// Official FIFA World Cup 2026 schedule
+// Matchday 2 through Final (80 matches — no Matchday 1)
+// Times are UTC
+//
+// To update knockout teams: replace 'TBD' with real team names below,
+// then go to /admin and click "Sync Teams from Code"
+
 export const FLAG = {
-  Mexico:'🇲🇽',Jamaica:'🇯🇲',Venezuela:'🇻🇪',Ecuador:'🇪🇨',
-  USA:'🇺🇸',Panama:'🇵🇦','Costa Rica':'🇨🇷',Canada:'🇨🇦',
-  Brazil:'🇧🇷',Paraguay:'🇵🇾',Colombia:'🇨🇴',Bolivia:'🇧🇴',
-  Argentina:'🇦🇷',Chile:'🇨🇱',Uruguay:'🇺🇾',Peru:'🇵🇪',
-  France:'🇫🇷',Belgium:'🇧🇪',Switzerland:'🇨🇭',Cameroon:'🇨🇲',
-  Spain:'🇪🇸',Portugal:'🇵🇹',Morocco:'🇲🇦','New Zealand':'🇳🇿',
-  England:'🏴',Germany:'🇩🇪',Croatia:'🇭🇷',Senegal:'🇸🇳',
-  Netherlands:'🇳🇱',Poland:'🇵🇱',Japan:'🇯🇵','DR Congo':'🇨🇩',
-  Italy:'🇮🇹',Turkey:'🇹🇷',Ghana:'🇬🇭',Indonesia:'🇮🇩',
-  'South Korea':'🇰🇷','Saudi Arabia':'🇸🇦',Iran:'🇮🇷',Uzbekistan:'🇺🇿',
-  Australia:'🇦🇺',Egypt:'🇪🇬',Nigeria:'🇳🇬',Guatemala:'🇬🇹',
-  Serbia:'🇷🇸',Denmark:'🇩🇰','Czech Republic':'🇨🇿',Tunisia:'🇹🇳',
-  TBD:'🏳️',
+  // Group A
+  Mexico: '🇲🇽', 'South Korea': '🇰🇷', 'Czech Republic': '🇨🇿', 'South Africa': '🇿🇦',
+  // Group B
+  Switzerland: '🇨🇭', Canada: '🇨🇦', Qatar: '🇶🇦', 'Bosnia and Herzegovina': '🇧🇦',
+  // Group C
+  Scotland: '🏴󠁧󠁢󠁳󠁣󠁴󠁿', Morocco: '🇲🇦', Brazil: '🇧🇷', Haiti: '🇭🇹',
+  // Group D
+  USA: '🇺🇸', Australia: '🇦🇺', Turkey: '🇹🇷', Paraguay: '🇵🇾',
+  // Group E
+  Germany: '🇩🇪', 'Ivory Coast': '🇨🇮', Ecuador: '🇪🇨', Curacao: '🇨🇼',
+  // Group F
+  Netherlands: '🇳🇱', Sweden: '🇸🇪', Tunisia: '🇹🇳', Japan: '🇯🇵',
+  // Group G
+  Belgium: '🇧🇪', 'New Zealand': '🇳🇿', Egypt: '🇪🇬', Iran: '🇮🇷',
+  // Group H
+  Uruguay: '🇺🇾', Spain: '🇪🇸', 'Cape Verde': '🇨🇻', 'Saudi Arabia': '🇸🇦',
+  // Group I
+  France: '🇫🇷', Senegal: '🇸🇳', Iraq: '🇮🇶', Norway: '🇳🇴',
+  // Group J
+  Argentina: '🇦🇷', Algeria: '🇩🇿', Austria: '🇦🇹', Jordan: '🇯🇴',
+  // Group K
+  Portugal: '🇵🇹', 'Congo DR': '🇨🇩', Uzbekistan: '🇺🇿', Colombia: '🇨🇴',
+  // Group L
+  Ghana: '🇬🇭', Panama: '🇵🇦', England: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', Croatia: '🇭🇷',
+  TBD: '🏳️',
 }
 
-// Groups: each array has [team1, team2, team3, team4]
-// Matchday schedule: (0v1,2v3), (0v2,1v3), (0v3,1v2)
-const GROUPS = {
-  A: { teams:['Mexico','Jamaica','Venezuela','Ecuador'],   dates:['2026-06-11','2026-06-15','2026-06-19'], tz:'-06:00' },
-  B: { teams:['USA','Panama','Costa Rica','Canada'],       dates:['2026-06-12','2026-06-16','2026-06-20'], tz:'-05:00' },
-  C: { teams:['Brazil','Bolivia','Colombia','Paraguay'],   dates:['2026-06-12','2026-06-16','2026-06-20'], tz:'-04:00' },
-  D: { teams:['Argentina','Peru','Chile','Uruguay'],       dates:['2026-06-13','2026-06-17','2026-06-21'], tz:'-03:00' },
-  E: { teams:['France','Belgium','Switzerland','Cameroon'],dates:['2026-06-13','2026-06-17','2026-06-21'], tz:'+02:00' },
-  F: { teams:['Spain','Morocco','Portugal','New Zealand'], dates:['2026-06-14','2026-06-18','2026-06-22'], tz:'+02:00' },
-  G: { teams:['England','Senegal','Germany','Croatia'],    dates:['2026-06-14','2026-06-18','2026-06-22'], tz:'+01:00' },
-  H: { teams:['Netherlands','Japan','Poland','DR Congo'],  dates:['2026-06-15','2026-06-19','2026-06-23'], tz:'+09:00' },
-  I: { teams:['Italy','Turkey','Ghana','Indonesia'],       dates:['2026-06-15','2026-06-19','2026-06-23'], tz:'+02:00' },
-  J: { teams:['South Korea','Uzbekistan','Saudi Arabia','Iran'], dates:['2026-06-16','2026-06-20','2026-06-24'], tz:'+09:00' },
-  K: { teams:['Australia','Guatemala','Nigeria','Egypt'],  dates:['2026-06-16','2026-06-20','2026-06-24'], tz:'+10:00' },
-  L: { teams:['Serbia','Tunisia','Denmark','Czech Republic'], dates:['2026-06-17','2026-06-21','2026-06-25'], tz:'+02:00' },
-}
+export const matches = [
+  // ── GROUP STAGE – Matchday 2 ───────────────────────────────────────────────
+  { homeTeam: 'Czech Republic',          awayTeam: 'South Africa',          kickoff: '2026-06-18T16:00:00Z', round: 'Group A - Matchday 2', group: 'A' },
+  { homeTeam: 'Switzerland',             awayTeam: 'Bosnia and Herzegovina', kickoff: '2026-06-18T19:00:00Z', round: 'Group B - Matchday 2', group: 'B' },
+  { homeTeam: 'Canada',                  awayTeam: 'Qatar',                  kickoff: '2026-06-18T22:00:00Z', round: 'Group B - Matchday 2', group: 'B' },
+  { homeTeam: 'Mexico',                  awayTeam: 'South Korea',            kickoff: '2026-06-19T01:00:00Z', round: 'Group A - Matchday 2', group: 'A' },
+  { homeTeam: 'Brazil',                  awayTeam: 'Haiti',                  kickoff: '2026-06-20T01:00:00Z', round: 'Group C - Matchday 2', group: 'C' },
+  { homeTeam: 'Scotland',                awayTeam: 'Morocco',                kickoff: '2026-06-19T22:00:00Z', round: 'Group C - Matchday 2', group: 'C' },
+  { homeTeam: 'Turkey',                  awayTeam: 'Paraguay',               kickoff: '2026-06-20T03:00:00Z', round: 'Group D - Matchday 2', group: 'D' },
+  { homeTeam: 'USA',                     awayTeam: 'Australia',              kickoff: '2026-06-19T19:00:00Z', round: 'Group D - Matchday 2', group: 'D' },
+  { homeTeam: 'Germany',                 awayTeam: 'Ivory Coast',            kickoff: '2026-06-20T20:00:00Z', round: 'Group E - Matchday 2', group: 'E' },
+  { homeTeam: 'Ecuador',                 awayTeam: 'Curacao',                kickoff: '2026-06-21T00:00:00Z', round: 'Group E - Matchday 2', group: 'E' },
+  { homeTeam: 'Netherlands',             awayTeam: 'Sweden',                 kickoff: '2026-06-20T17:00:00Z', round: 'Group F - Matchday 2', group: 'F' },
+  { homeTeam: 'Tunisia',                 awayTeam: 'Japan',                  kickoff: '2026-06-21T04:00:00Z', round: 'Group F - Matchday 2', group: 'F' },
+  { homeTeam: 'Uruguay',                 awayTeam: 'Cape Verde',             kickoff: '2026-06-21T22:00:00Z', round: 'Group H - Matchday 2', group: 'H' },
+  { homeTeam: 'Spain',                   awayTeam: 'Saudi Arabia',           kickoff: '2026-06-21T16:00:00Z', round: 'Group H - Matchday 2', group: 'H' },
+  { homeTeam: 'Belgium',                 awayTeam: 'Iran',                   kickoff: '2026-06-21T19:00:00Z', round: 'Group G - Matchday 2', group: 'G' },
+  { homeTeam: 'New Zealand',             awayTeam: 'Egypt',                  kickoff: '2026-06-22T01:00:00Z', round: 'Group G - Matchday 2', group: 'G' },
+  { homeTeam: 'Norway',                  awayTeam: 'Senegal',                kickoff: '2026-06-23T00:00:00Z', round: 'Group I - Matchday 2', group: 'I' },
+  { homeTeam: 'France',                  awayTeam: 'Iraq',                   kickoff: '2026-06-22T21:00:00Z', round: 'Group I - Matchday 2', group: 'I' },
+  { homeTeam: 'Argentina',               awayTeam: 'Austria',                kickoff: '2026-06-22T17:00:00Z', round: 'Group J - Matchday 2', group: 'J' },
+  { homeTeam: 'Jordan',                  awayTeam: 'Algeria',                kickoff: '2026-06-23T03:00:00Z', round: 'Group J - Matchday 2', group: 'J' },
+  { homeTeam: 'England',                 awayTeam: 'Ghana',                  kickoff: '2026-06-23T20:00:00Z', round: 'Group L - Matchday 2', group: 'L' },
+  { homeTeam: 'Panama',                  awayTeam: 'Croatia',                kickoff: '2026-06-23T23:00:00Z', round: 'Group L - Matchday 2', group: 'L' },
+  { homeTeam: 'Portugal',                awayTeam: 'Uzbekistan',             kickoff: '2026-06-23T17:00:00Z', round: 'Group K - Matchday 2', group: 'K' },
+  { homeTeam: 'Colombia',                awayTeam: 'Congo DR',               kickoff: '2026-06-24T02:00:00Z', round: 'Group K - Matchday 2', group: 'K' },
 
-// Matchday pairings: indices into teams array
-const PAIRINGS = [
-  [[0,1],[2,3]],  // Matchday 1
-  [[0,2],[1,3]],  // Matchday 2
-  [[0,3],[1,2]],  // Matchday 3
+  // ── GROUP STAGE – Matchday 3 ───────────────────────────────────────────────
+  { homeTeam: 'Scotland',                awayTeam: 'Brazil',                 kickoff: '2026-06-24T22:00:00Z', round: 'Group C - Matchday 3', group: 'C' },
+  { homeTeam: 'Morocco',                 awayTeam: 'Haiti',                  kickoff: '2026-06-24T22:00:00Z', round: 'Group C - Matchday 3', group: 'C' },
+  { homeTeam: 'Switzerland',             awayTeam: 'Canada',                 kickoff: '2026-06-24T19:00:00Z', round: 'Group B - Matchday 3', group: 'B' },
+  { homeTeam: 'Bosnia and Herzegovina',  awayTeam: 'Qatar',                  kickoff: '2026-06-24T19:00:00Z', round: 'Group B - Matchday 3', group: 'B' },
+  { homeTeam: 'Czech Republic',          awayTeam: 'Mexico',                 kickoff: '2026-06-25T01:00:00Z', round: 'Group A - Matchday 3', group: 'A' },
+  { homeTeam: 'South Africa',            awayTeam: 'South Korea',            kickoff: '2026-06-25T01:00:00Z', round: 'Group A - Matchday 3', group: 'A' },
+  { homeTeam: 'Curacao',                 awayTeam: 'Ivory Coast',            kickoff: '2026-06-25T20:00:00Z', round: 'Group E - Matchday 3', group: 'E' },
+  { homeTeam: 'Ecuador',                 awayTeam: 'Germany',                kickoff: '2026-06-25T20:00:00Z', round: 'Group E - Matchday 3', group: 'E' },
+  { homeTeam: 'Japan',                   awayTeam: 'Sweden',                 kickoff: '2026-06-25T23:00:00Z', round: 'Group F - Matchday 3', group: 'F' },
+  { homeTeam: 'Tunisia',                 awayTeam: 'Netherlands',            kickoff: '2026-06-25T23:00:00Z', round: 'Group F - Matchday 3', group: 'F' },
+  { homeTeam: 'Turkey',                  awayTeam: 'USA',                    kickoff: '2026-06-26T02:00:00Z', round: 'Group D - Matchday 3', group: 'D' },
+  { homeTeam: 'Paraguay',                awayTeam: 'Australia',              kickoff: '2026-06-26T02:00:00Z', round: 'Group D - Matchday 3', group: 'D' },
+  { homeTeam: 'Norway',                  awayTeam: 'France',                 kickoff: '2026-06-26T19:00:00Z', round: 'Group I - Matchday 3', group: 'I' },
+  { homeTeam: 'Senegal',                 awayTeam: 'Iraq',                   kickoff: '2026-06-26T19:00:00Z', round: 'Group I - Matchday 3', group: 'I' },
+  { homeTeam: 'Egypt',                   awayTeam: 'Iran',                   kickoff: '2026-06-27T03:00:00Z', round: 'Group G - Matchday 3', group: 'G' },
+  { homeTeam: 'New Zealand',             awayTeam: 'Belgium',                kickoff: '2026-06-27T03:00:00Z', round: 'Group G - Matchday 3', group: 'G' },
+  { homeTeam: 'Cape Verde',              awayTeam: 'Saudi Arabia',           kickoff: '2026-06-27T00:00:00Z', round: 'Group H - Matchday 3', group: 'H' },
+  { homeTeam: 'Uruguay',                 awayTeam: 'Spain',                  kickoff: '2026-06-27T00:00:00Z', round: 'Group H - Matchday 3', group: 'H' },
+  { homeTeam: 'Panama',                  awayTeam: 'England',                kickoff: '2026-06-27T21:00:00Z', round: 'Group L - Matchday 3', group: 'L' },
+  { homeTeam: 'Croatia',                 awayTeam: 'Ghana',                  kickoff: '2026-06-27T21:00:00Z', round: 'Group L - Matchday 3', group: 'L' },
+  { homeTeam: 'Algeria',                 awayTeam: 'Austria',                kickoff: '2026-06-28T02:00:00Z', round: 'Group J - Matchday 3', group: 'J' },
+  { homeTeam: 'Jordan',                  awayTeam: 'Argentina',              kickoff: '2026-06-28T02:00:00Z', round: 'Group J - Matchday 3', group: 'J' },
+  { homeTeam: 'Colombia',                awayTeam: 'Portugal',               kickoff: '2026-06-27T23:30:00Z', round: 'Group K - Matchday 3', group: 'K' },
+  { homeTeam: 'Congo DR',                awayTeam: 'Uzbekistan',             kickoff: '2026-06-27T23:30:00Z', round: 'Group K - Matchday 3', group: 'K' },
+
+  // ── ROUND OF 32 ────────────────────────────────────────────────────────────
+  { homeTeam: 'TBD', awayTeam: 'TBD', kickoff: '2026-06-28T19:00:00Z', round: 'Round of 32', group: null },
+  { homeTeam: 'TBD', awayTeam: 'TBD', kickoff: '2026-06-29T20:30:00Z', round: 'Round of 32', group: null },
+  { homeTeam: 'TBD', awayTeam: 'TBD', kickoff: '2026-06-29T23:00:00Z', round: 'Round of 32', group: null },
+  { homeTeam: 'TBD', awayTeam: 'TBD', kickoff: '2026-06-29T17:00:00Z', round: 'Round of 32', group: null },
+  { homeTeam: 'TBD', awayTeam: 'TBD', kickoff: '2026-06-30T21:00:00Z', round: 'Round of 32', group: null },
+  { homeTeam: 'TBD', awayTeam: 'TBD', kickoff: '2026-06-30T17:00:00Z', round: 'Round of 32', group: null },
+  { homeTeam: 'TBD', awayTeam: 'TBD', kickoff: '2026-06-30T01:00:00Z', round: 'Round of 32', group: null },
+  { homeTeam: 'TBD', awayTeam: 'TBD', kickoff: '2026-07-01T16:00:00Z', round: 'Round of 32', group: null },
+  { homeTeam: 'TBD', awayTeam: 'TBD', kickoff: '2026-07-01T00:00:00Z', round: 'Round of 32', group: null },
+  { homeTeam: 'TBD', awayTeam: 'TBD', kickoff: '2026-07-01T20:00:00Z', round: 'Round of 32', group: null },
+  { homeTeam: 'TBD', awayTeam: 'TBD', kickoff: '2026-07-02T23:00:00Z', round: 'Round of 32', group: null },
+  { homeTeam: 'TBD', awayTeam: 'TBD', kickoff: '2026-07-02T19:00:00Z', round: 'Round of 32', group: null },
+  { homeTeam: 'TBD', awayTeam: 'TBD', kickoff: '2026-07-03T02:00:00Z', round: 'Round of 32', group: null },
+  { homeTeam: 'TBD', awayTeam: 'TBD', kickoff: '2026-07-03T22:00:00Z', round: 'Round of 32', group: null },
+  { homeTeam: 'TBD', awayTeam: 'TBD', kickoff: '2026-07-04T01:30:00Z', round: 'Round of 32', group: null },
+  { homeTeam: 'TBD', awayTeam: 'TBD', kickoff: '2026-07-03T18:00:00Z', round: 'Round of 32', group: null },
+
+  // ── ROUND OF 16 ────────────────────────────────────────────────────────────
+  { homeTeam: 'TBD', awayTeam: 'TBD', kickoff: '2026-07-04T21:00:00Z', round: 'Round of 16', group: null },
+  { homeTeam: 'TBD', awayTeam: 'TBD', kickoff: '2026-07-04T17:00:00Z', round: 'Round of 16', group: null },
+  { homeTeam: 'TBD', awayTeam: 'TBD', kickoff: '2026-07-05T20:00:00Z', round: 'Round of 16', group: null },
+  { homeTeam: 'TBD', awayTeam: 'TBD', kickoff: '2026-07-06T00:00:00Z', round: 'Round of 16', group: null },
+  { homeTeam: 'TBD', awayTeam: 'TBD', kickoff: '2026-07-06T19:00:00Z', round: 'Round of 16', group: null },
+  { homeTeam: 'TBD', awayTeam: 'TBD', kickoff: '2026-07-07T00:00:00Z', round: 'Round of 16', group: null },
+  { homeTeam: 'TBD', awayTeam: 'TBD', kickoff: '2026-07-07T16:00:00Z', round: 'Round of 16', group: null },
+  { homeTeam: 'TBD', awayTeam: 'TBD', kickoff: '2026-07-07T20:00:00Z', round: 'Round of 16', group: null },
+
+  // ── QUARTER-FINALS ─────────────────────────────────────────────────────────
+  { homeTeam: 'TBD', awayTeam: 'TBD', kickoff: '2026-07-09T20:00:00Z', round: 'Quarter-finals', group: null },
+  { homeTeam: 'TBD', awayTeam: 'TBD', kickoff: '2026-07-10T19:00:00Z', round: 'Quarter-finals', group: null },
+  { homeTeam: 'TBD', awayTeam: 'TBD', kickoff: '2026-07-11T21:00:00Z', round: 'Quarter-finals', group: null },
+  { homeTeam: 'TBD', awayTeam: 'TBD', kickoff: '2026-07-12T01:00:00Z', round: 'Quarter-finals', group: null },
+
+  // ── SEMI-FINALS ────────────────────────────────────────────────────────────
+  { homeTeam: 'TBD', awayTeam: 'TBD', kickoff: '2026-07-14T19:00:00Z', round: 'Semi-finals', group: null },
+  { homeTeam: 'TBD', awayTeam: 'TBD', kickoff: '2026-07-15T19:00:00Z', round: 'Semi-finals', group: null },
+
+  // ── THIRD PLACE ────────────────────────────────────────────────────────────
+  { homeTeam: 'TBD', awayTeam: 'TBD', kickoff: '2026-07-18T21:00:00Z', round: 'Third Place', group: null },
+
+  // ── FINAL ──────────────────────────────────────────────────────────────────
+  { homeTeam: 'TBD', awayTeam: 'TBD', kickoff: '2026-07-19T19:00:00Z', round: 'Final', group: null },
 ]
-
-const TIMES = ['T15:00:00','T18:00:00']
-
-function buildGroupMatches() {
-  const out = []
-  for (const [letter, g] of Object.entries(GROUPS)) {
-    PAIRINGS.forEach((day, dayIdx) => {
-      const date = g.dates[dayIdx]
-      const mdLabel = `Group ${letter} - Matchday ${dayIdx + 1}`
-      day.forEach(([hi, ai], pairIdx) => {
-        out.push({
-          homeTeam: g.teams[hi],
-          awayTeam: g.teams[ai],
-          kickoff: `${date}${TIMES[pairIdx]}${g.tz}`,
-          round: mdLabel,
-          group: letter,
-        })
-      })
-    })
-  }
-  return out
-}
-
-// Knockout stage – TBD teams (filled by admin when group stage ends)
-function tbd(n) { return `TBD${n}` }
-
-function buildKnockoutMatches() {
-  const ko = []
-
-  // Round of 32 – 16 matches – July 4-8
-  const r32Dates = [
-    '2026-07-04T16:00:00Z','2026-07-04T20:00:00Z',
-    '2026-07-05T16:00:00Z','2026-07-05T20:00:00Z',
-    '2026-07-06T16:00:00Z','2026-07-06T20:00:00Z',
-    '2026-07-07T16:00:00Z','2026-07-07T20:00:00Z',
-    '2026-07-08T16:00:00Z','2026-07-08T20:00:00Z',
-    '2026-07-09T16:00:00Z','2026-07-09T20:00:00Z',
-    '2026-07-10T16:00:00Z','2026-07-10T20:00:00Z',
-    '2026-07-11T16:00:00Z','2026-07-11T20:00:00Z',
-  ]
-  for (let i = 0; i < 16; i++) {
-    ko.push({ homeTeam:'TBD', awayTeam:'TBD', kickoff: r32Dates[i], round:'Round of 32', group: null })
-  }
-
-  // Round of 16 – 8 matches – July 13-16
-  const r16Dates = [
-    '2026-07-13T16:00:00Z','2026-07-13T20:00:00Z',
-    '2026-07-14T16:00:00Z','2026-07-14T20:00:00Z',
-    '2026-07-15T16:00:00Z','2026-07-15T20:00:00Z',
-    '2026-07-16T16:00:00Z','2026-07-16T20:00:00Z',
-  ]
-  for (let i = 0; i < 8; i++) {
-    ko.push({ homeTeam:'TBD', awayTeam:'TBD', kickoff: r16Dates[i], round:'Round of 16', group: null })
-  }
-
-  // Quarter-finals – 4 matches – July 18-19
-  const qfDates = [
-    '2026-07-18T16:00:00Z','2026-07-18T20:00:00Z',
-    '2026-07-19T16:00:00Z','2026-07-19T20:00:00Z',
-  ]
-  for (let i = 0; i < 4; i++) {
-    ko.push({ homeTeam:'TBD', awayTeam:'TBD', kickoff: qfDates[i], round:'Quarter-finals', group: null })
-  }
-
-  // Semi-finals – 2 matches – July 22-23
-  ko.push({ homeTeam:'TBD', awayTeam:'TBD', kickoff:'2026-07-22T20:00:00Z', round:'Semi-finals', group: null })
-  ko.push({ homeTeam:'TBD', awayTeam:'TBD', kickoff:'2026-07-23T20:00:00Z', round:'Semi-finals', group: null })
-
-  // Third place – July 25
-  ko.push({ homeTeam:'TBD', awayTeam:'TBD', kickoff:'2026-07-25T20:00:00Z', round:'Third Place', group: null })
-
-  // Final – July 27
-  ko.push({ homeTeam:'TBD', awayTeam:'TBD', kickoff:'2026-07-27T20:00:00Z', round:'Final', group: null })
-
-  return ko
-}
-
-export const matches = [...buildGroupMatches(), ...buildKnockoutMatches()]
