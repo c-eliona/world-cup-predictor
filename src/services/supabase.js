@@ -122,6 +122,22 @@ export async function updateMatchResult(matchId, homeScore, awayScore) {
   }
 }
 
+// Reset a match result (removes score, sets finished=false, resets all prediction points to 0)
+export async function resetMatchResult(matchId) {
+  const { error } = await supabase.from('matches')
+    .update({ home_score: null, away_score: null, finished: false })
+    .eq('id', matchId)
+  if (error) throw new Error(error.message)
+
+  // Reset all prediction points for this match back to 0
+  const { data: preds } = await supabase.from('predictions').select('id').eq('match_id', matchId)
+  if (preds && preds.length > 0) {
+    for (const pred of preds) {
+      await supabase.from('predictions').update({ points: 0 }).eq('id', pred.id)
+    }
+  }
+}
+
 // Update team names for a single TBD match (preserves all predictions)
 export async function updateMatchTeams(matchId, homeTeam, awayTeam) {
   const { error } = await supabase.from('matches')

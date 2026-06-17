@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { subscribeToMatches, updateMatchResult, updateMatchTeams, syncMatchTeams, seedMatches } from '../services/supabase'
+import { subscribeToMatches, updateMatchResult, resetMatchResult, updateMatchTeams, syncMatchTeams, seedMatches } from '../services/supabase'
 import { matches as matchData, FLAG } from '../data/matches'
 
 const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || 'AdrianoSeksi'
@@ -140,9 +140,20 @@ function AdminMatchRow({ match, onUpdate, onUpdateTeams }) {
               )}
             </div>
           ) : !isTbd && match.finished ? (
-            <button onClick={() => setEditMode(true)} className="text-xs text-gray-500 hover:text-white border border-gray-700 rounded px-2 py-1">
-              Edit
-            </button>
+            <div className="flex items-center gap-2">
+              <button onClick={() => setEditMode(true)} className="text-xs text-gray-500 hover:text-white border border-gray-700 rounded px-2 py-1">
+                Edit
+              </button>
+              <button
+                onClick={async () => {
+                  if (!confirm('Remove this result? All prediction points will be reset to 0.')) return
+                  try { await resetMatchResult(match.id) } catch (e) { setError(e.message) }
+                }}
+                className="text-xs text-red-500 hover:text-red-400 border border-red-900 rounded px-2 py-1"
+              >
+                Remove
+              </button>
+            </div>
           ) : null}
         </div>
       </div>
