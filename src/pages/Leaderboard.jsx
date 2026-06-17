@@ -10,14 +10,25 @@ function rankEmoji(rank) {
   return `${rank}.`
 }
 
+const TZ = 'America/New_York'
+
+function formatKickoff(kickoff) {
+  return new Date(kickoff).toLocaleString('en-GB', {
+    weekday: 'short', day: 'numeric', month: 'short',
+    hour: '2-digit', minute: '2-digit', timeZone: TZ,
+  })
+}
+
 export default function Leaderboard() {
   const { player } = usePlayer()
   const [leaderboard, setLeaderboard] = useState([])
   const [loading, setLoading] = useState(true)
   const [selectedPlayer, setSelectedPlayer] = useState(null)
-  const [playerPreds, setPlayerPreds] = useState([])
+  const [pendingPreds, setPendingPreds] = useState([])
+  const [scoredPreds, setScoredPreds] = useState([])
   const [matches, setMatches] = useState([])
   const [loadingDetail, setLoadingDetail] = useState(false)
+  const [detailTab, setDetailTab] = useState('pending') // 'pending' | 'scored'
 
   useEffect(() => {
     const unsub = subscribeToLeaderboard((data) => {
@@ -30,6 +41,7 @@ export default function Leaderboard() {
 
   async function openPlayerDetail(p) {
     setSelectedPlayer(p)
+    setDetailTab('pending')
     setLoadingDetail(true)
     try {
       const { data, error } = await supabase
@@ -37,27 +49,45 @@ export default function Leaderboard() {
         .select('*')
         .eq('player_id', p.id)
 
-      if (error || !data) { setPlayerPreds([]); return }
+      if (error || !data) { setPendingPreds([]); setScoredPreds([]); return }
 
       const matchMap = {}
       matches.forEach(m => { matchMap[m.id] = m })
 
-      const enriched = data
-        .filter(pred => matchMap[pred.match_id]?.finished)
-        .map(pred => ({
+      const now = new Date()
+
+      const pending = []
+      const scored = []
+
+      data.forEach(pred => {
+        const m = matchMap[pred.match_id]
+        if (!m) return
+        const enriched = {
           id: pred.id,
           matchId: pred.match_id,
           homePrediction: pred.home_prediction,
           awayPrediction: pred.away_prediction,
           points: pred.points,
-          match: matchMap[pred.match_id],
-        }))
-        .sort((a, b) => new Date(a.match?.kickoff) - new Date(b.match?.kickoff))
+          match: m,
+        }
+        if (m.finished) {
+          scored.push(enriched)
+        } else if (new Date(m.kickoff) < now) {
+          // Kicked off but result not entered yet — "pending"
+          pending.push(enriched)
+        }
+        // Matches not yet kicked off are not shown (still predictable, keep them private)
+      })
 
-      setPlayerPreds(enriched)
+      pending.sort((a, b) => new Date(a.match.kickoff) - new Date(b.match.kickoff))
+      scored.sort((a, b) => new Date(a.match.kickoff) - new Date(b.match.kickoff))
+
+      setPendingPreds(pending)
+      setScoredPreds(scored)
     } catch (e) {
       console.error(e)
-      setPlayerPreds([])
+      setPendingPreds([])
+      setScoredPreds([])
     } finally {
       setLoadingDetail(false)
     }
@@ -65,7 +95,8 @@ export default function Leaderboard() {
 
   function closeDetail() {
     setSelectedPlayer(null)
-    setPlayerPreds([])
+    setPendingPreds([])
+    setScoredPreds([])
   }
 
   if (loading) {
@@ -77,12 +108,16 @@ export default function Leaderboard() {
   }
 
   if (selectedPlayer) {
+    const activeList = detailTab === 'pending' ? pendingPreds : scoredPreds
+
     return (
       <div className="max-w-2xl mx-auto px-4 py-6">
         <button onClick={closeDetail} className="flex items-center gap-2 text-gray-400 hover:text-white mb-6 text-sm">
           ← Back to Leaderboard
         </button>
-        <div className="card mb-6">
+
+        {/* Player header */}
+        <div className="card mb-4">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-xl font-bold text-white">{selectedPlayer.name}</h2>
@@ -94,30 +129,67 @@ export default function Leaderboard() {
           </div>
         </div>
 
+        {/* Tabs: Pending / Scored */}
+        <div className="flex rounded-xl overflow-hidden border border-gray-800 mb-5">
+          <button
+            onClick={() => setDetailTab('pending')}
+            className={`flex-1 py-2 text-sm font-semibold transition-colors ${
+              detailTab === 'pending' ? 'bg-gray-700 text-white' : 'bg-gray-900 text-gray-500 hover:text-white'
+            }`}
+          >
+            Pending {pendingPreds.length > 0 && <span className="ml-1 text-amber-400">({pendingPreds.length})</span>}
+          </button>
+          <button
+            onClick={() => setDetailTab('scored')}
+            className={`flex-1 py-2 text-sm font-semibold transition-colors ${
+              detailTab === 'scored' ? 'bg-gray-700 text-white' : 'bg-gray-900 text-gray-500 hover:text-white'
+            }`}
+          >
+            Scored {scoredPreds.length > 0 && <span className="ml-1 text-emerald-400">({scoredPreds.length})</span>}
+          </button>
+        </div>
+
         {loadingDetail ? (
           <div className="text-gray-500 text-center py-8 animate-pulse">Loading predictions...</div>
-        ) : playerPreds.length === 0 ? (
-          <div className="text-gray-500 text-center py-8">No scored predictions yet.</div>
+        ) : activeList.length === 0 ? (
+          <div className="text-gray-500 text-center py-8">
+            {detailTab === 'pending' ? 'No pending predictions.' : 'No scored predictions yet.'}
+          </div>
         ) : (
           <div className="space-y-3">
-            {playerPreds.map((pred) => {
+            {activeList.map((pred) => {
               const m = pred.match
               if (!m) return null
               const homeFlag = FLAG[m.homeTeam] || '🏳️'
               const awayFlag = FLAG[m.awayTeam] || '🏳️'
+
               return (
                 <div key={pred.id} className="card">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs text-gray-500">{m.round}</span>
-                    {pred.points === 3 && <span className="text-xs text-emerald-400 font-bold">+3 ⭐ Exact!</span>}
-                    {pred.points === 1 && <span className="text-xs text-amber-400 font-bold">+1 Correct result</span>}
-                    {pred.points === 0 && <span className="text-xs text-gray-500 font-bold">+0</span>}
+                    <span className="text-xs text-gray-500">{formatKickoff(m.kickoff)}</span>
+                    {detailTab === 'scored' && (
+                      <>
+                        {pred.points === 3 && <span className="text-xs text-emerald-400 font-bold">+3 ⭐ Exact!</span>}
+                        {pred.points === 1 && <span className="text-xs text-amber-400 font-bold">+1 Correct result</span>}
+                        {pred.points === 0 && <span className="text-xs text-gray-500 font-bold">+0</span>}
+                      </>
+                    )}
+                    {detailTab === 'pending' && (
+                      <span className="text-xs text-amber-500 font-medium">⏳ Awaiting result</span>
+                    )}
                   </div>
+
                   <div className="flex items-center justify-between text-sm">
                     <span className="font-medium text-white">{homeFlag} {m.homeTeam}</span>
                     <div className="text-center">
-                      <div className="text-white font-bold">{m.homeScore}–{m.awayScore}</div>
-                      <div className="text-gray-500 text-xs">Your: {pred.homePrediction}–{pred.awayPrediction}</div>
+                      {detailTab === 'scored' ? (
+                        <>
+                          <div className="text-white font-bold text-base">{m.homeScore}–{m.awayScore}</div>
+                          <div className="text-gray-500 text-xs mt-0.5">Predicted: {pred.homePrediction}–{pred.awayPrediction}</div>
+                        </>
+                      ) : (
+                        <div className="text-amber-300 font-bold text-base">{pred.homePrediction}–{pred.awayPrediction}</div>
+                      )}
                     </div>
                     <span className="font-medium text-white">{m.awayTeam} {awayFlag}</span>
                   </div>
