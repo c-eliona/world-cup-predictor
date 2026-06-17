@@ -72,11 +72,10 @@ export default function Leaderboard() {
         }
         if (m.finished) {
           scored.push(enriched)
-        } else if (new Date(m.kickoff) < now) {
-          // Kicked off but result not entered yet — "pending"
+        } else {
+          // All unfinished matches (including future ones) shown as pending
           pending.push(enriched)
         }
-        // Matches not yet kicked off are not shown (still predictable, keep them private)
       })
 
       pending.sort((a, b) => new Date(a.match.kickoff) - new Date(b.match.kickoff))
